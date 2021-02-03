@@ -12,3 +12,11 @@ module "network" {
   resource_name = var.resource_name
   common_tags   = local.common_tags
 }
+
+module "ecr_repo" {
+  source = "../../modules//ecr-repo"
+
+  env_name      = var.env_name
+  resource_name = var.resource_name
+  common_tags   = local.common_tags
+}
