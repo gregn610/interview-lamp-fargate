@@ -17,5 +17,7 @@ module "fargate" {
   health_check    = var.health_check
   certificate_arn = var.certificate_arn
 
+  internal = false
+
 
 }
