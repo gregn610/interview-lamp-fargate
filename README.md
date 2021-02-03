@@ -9,6 +9,42 @@
 
 # Code layout
 ```console
+src/terraform                                   # 
+├── env                                         # Environments ( dev, staging, prod etc. ) & settings / variables
+│   ├── dev                                     # 
+│   │   └── terragrunt.hcl                      # Use Terragrunt for DRY
+│   └── prod                                    # 
+│       ├── provider.tf                         # 
+│       └── terragrunt.hcl                      # 
+├── modules                                     # Terraform modules, no Terragrunt for portability
+│   ├── demo-app                                # Module for Fargate demo app
+│   │   ├── README.md                           # 
+│   │   ├── data.tf                             # 
+│   │   ├── main.tf                             # 
+│   │   ├── outputs.tf                          # 
+│   │   ├── turnerlabs                          # 
+<snip>                                          # 
+│   │   └── variables.tf                        # 
+│   ├── ecr-repo                                # Module for ECR container repository
+│   │   ├── data.tf                             # 
+│   │   ├── files                               # 
+│   │   │   └── ecr-principle-assume-role.json  # 
+│   │   ├── main.tf                             # 
+│   │   ├── outputs.tf                          # 
+│   │   └── variables.tf                        # 
+│   └── network                                 # Module for VPC and network
+│       ├── data.tf                             # 
+│       ├── main.tf                             # 
+│       ├── outputs.tf                          # 
+│       └── variables.tf                        # 
+├── stacks                                      # Assemble different combinations of modules for differnt deployment requirements
+│   ├── full                                    # Deploy everything
+│   │   ├── terraform.tf                        # 
+│   │   └── variables.tf                        # 
+│   ├── lite                                    # VPC, Hostedzone, certs etc. already deployed
+│   └── terragrunt.hcl                          # 
+└── terragrunt.hcl                              # Use terragrunt for DRY
+
 
 ```
 
