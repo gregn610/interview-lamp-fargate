@@ -14,7 +14,7 @@ variable "scale_down_cron" {
   default = "cron(0 23 * * ? *)"
 }
 
-# The mimimum number of containers to scale down to.
+# The minimum number of containers to scale down to.
 # Set this and `scale_down_max_capacity` to 0 to turn off service on the `scale_down_cron` schedule.
 variable "scale_down_min_capacity" {
   default = 0
