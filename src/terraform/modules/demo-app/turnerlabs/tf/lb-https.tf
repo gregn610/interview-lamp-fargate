@@ -1,13 +1,7 @@
 # adds an https listener to the load balancer
 # (delete this file if you only want http)
 
-# The port to listen on for HTTPS, always use 443
-variable "https_port" {
-  default = "443"
-}
 
-# The ARN for the SSL certificate
-variable "certificate_arn" {}
 
 resource "aws_alb_listener" "https" {
   load_balancer_arn = aws_alb.main.id

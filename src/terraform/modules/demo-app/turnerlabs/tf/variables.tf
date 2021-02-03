@@ -13,29 +13,10 @@ variable "common_tags" {
   description = "Common AWS resource tags"
   default     = {}
 }
-
 # TurnerLabs
-/*
- * variables.tf
- * Common variables to use in various Terraform files (*.tf)
- */
 
-# The AWS region to use for the dev environment's infrastructure
-variable "region" {
-  default = "us-east-1"
-}
-
-# Tags for the infrastructure
-variable "tags" {
-  type = map(string)
-}
-
-# The application's name
-variable "app" {
-}
-
-# The environment that is being built
-variable "environment" {
+variable "aws_region" {
+  description = "AWS region the resources are deployed to"
 }
 
 # The port the container will listen on, used for load balancer health check
@@ -55,15 +36,30 @@ variable "lb_protocol" {
 }
 
 # Network configuration
-
-# The VPC to use for the Fargate cluster
+#
 variable "vpc" {
+  description = "The VPC to use for the Fargate cluster"
 }
 
-# The private subnets, minimum of 2, that are a part of the VPC(s)
+#
 variable "private_subnets" {
+  description = "The private subnets, minimum of 2, that are a part of the VPC(s)"
 }
 
-# The public subnets, minimum of 2, that are a part of the VPC(s)
+#
 variable "public_subnets" {
+  description = "The public subnets, minimum of 2, that are a part of the VPC(s)"
+}
+
+variable "health_check" {
+  description = "The path to the health check for the load balancer to know if the container(s) are ready"
+}
+
+variable "certificate_arn" {
+  description = "The ARN for the SSL certificate"
+}
+
+variable "https_port" {
+  description = "The port to listen on for HTTPS, always use 443"
+  default = "443"
 }

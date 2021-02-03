@@ -8,7 +8,6 @@ The optional components can be removed by simply deleting the `.tf` file.
 
 | Name | Description | Optional |
 |------|-------------|:----:|
-| [main.tf][edm] | Terrform remote state, AWS provider, output |  |
 | [ecs.tf][ede] | ECS Cluster, Service, Task Definition, ecsTaskExecutionRole, CloudWatch Log Group |  |
 | [lb.tf][edl] | ALB, Target Group, S3 bucket for access logs  |  |
 | [nsg.tf][edn] | NSG for ALB and Task |  |
@@ -16,10 +15,8 @@ The optional components can be removed by simply deleting the `.tf` file.
 | [lb-https.tf][edlhttps] | HTTPS listener, NSG rule. Delete if HTTP only | Yes |
 | [dashboard.tf][edd] | CloudWatch dashboard: CPU, memory, and HTTP-related metrics | Yes |
 | [role.tf][edr] | Application Role for container | Yes |
-| [cicd.tf][edc] | IAM user that can be used by CI/CD systems | Yes |
 | [autoscale-perf.tf][edap] | Performance-based auto scaling | Yes |
 | [autoscale-time.tf][edat] | Time-based auto scaling | Yes |
-| [logs-logzio.tf][edll] | Ship container logs to logz.io | Yes |
 | [secretsmanager.tf][edsm] | Add a Secrets Manager secret with a CMK KMS key. Also gives app role and ECS task definition role access to read secrets from Secrets Manager | Yes |
 | [secrets-sidecar.tf][ssc] | Adds a task definition configuration for deploying your app along with a sidecar container that writes your secrets manager secret to a file. Note that this is dependent upon opting in to `secretsmanager.tf`. | Yes |
 | [ssm-parameters.tf][ssm] | Add a CMK KMS key for use with SSM Parameter Store. Also gives ECS task definition role access to read secrets from parameter store. | Yes |
@@ -41,8 +38,6 @@ $ terraform apply
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
-| app | The application's name | string | - | yes |
-| aws_profile | The AWS Profile to use | string | - | yes |
 | certificate_arn | The ARN for the SSL certificate | string | - | yes |
 | container_name | The name of the container to run | string | `app` | no |
 | container_port | The port the container will listen on, used for load balancer health check Best practice is that this value is higher than 1024 so the container processes isn't running at root. | string | - | yes |
@@ -61,14 +56,10 @@ $ terraform apply
 | internal | Whether the application is available on the public internet, also will determine which subnets will be used (public or private) | string | `true` | no |
 | lb_port | The port the load balancer will listen on | string | `80` | no |
 | lb_protocol | The load balancer protocol | string | `HTTP` | no |
-| logs_retention_in_days | Specifies the number of days you want to retain log events | int | 90 | no |
-| logz_token | The auth token to use for sending logs to Logz.io | string | - | yes |
-| logz_url | The endpoint to use for sending logs to Logz.io | string | `https://listener.logz.io:8071` | no |
 | private_subnets | The private subnets, minimum of 2, that are a part of the VPC(s) | string | - | yes |
 | public_subnets | The public subnets, minimum of 2, that are a part of the VPC(s) | string | - | yes |
 | region | The AWS region to use for the dev environment's infrastructure`. | string | `us-east-1` | no |
 | replicas | How many containers to run | string | `1` | no |
-| saml_role | The SAML role to use for adding users to the ECR policy | string | - | yes |
 | scale_down_cron | Default scale down at 7 pm every day | string | `cron(0 23 * * ? *)` | no |
 | scale_down_max_capacity | The maximum number of containers to scale down to. | string | `0` | no |
 | scale_down_min_capacity | The mimimum number of containers to scale down to. Set this and `scale_down_max_capacity` to 0 to turn off service on the `scale_down_cron` schedule. | string | `0` | no |
@@ -76,7 +67,7 @@ $ terraform apply
 | secret_dir | directory where secret is written | string | `/var/secret` | yes |
 | secret_sidecar_image | sidecar container that writes the secret to a file accessible by app container | string | `quay.io/turner/secretsmanager-sidecar` | yes |
 | secrets_saml_users | The users (email addresses) from the saml role to give access | list | - | yes |
-| tags | Tags for the infrastructure | map | - | yes |
+| common_tags | Tags for the infrastructure | map | - | yes |
 | vpc | The VPC to use for the Fargate cluster | string | - | yes |
 
 ## Outputs

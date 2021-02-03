@@ -9,8 +9,8 @@
 
 # cw event rule
 resource "aws_cloudwatch_event_rule" "ecs_event_stream" {
-  name        = "${var.app}-${var.environment}-ecs-event-stream"
-  description = "Passes ecs event logs for ${var.app}-${var.environment} to a lambda that writes them to cw logs"
+  name        = "${var.env_name}-${var.resource_name}-ecs-event-stream"
+  description = "Passes ecs event logs for ${var.env_name}-${var.resource_name} to a lambda that writes them to cw logs"
 
   event_pattern = <<PATTERN
   {
@@ -41,7 +41,7 @@ data "archive_file" "lambda_zip" {
   type                    = "zip"
   source_content          = data.template_file.lambda_source.rendered
   source_content_filename = "index.js"
-  output_path             = "lambda-${var.app}.zip"
+  output_path             = "${var.env_name}-${var.resource_name}-lambda.zip"
 }
 
 resource "aws_lambda_permission" "ecs_event_stream" {
@@ -53,13 +53,13 @@ resource "aws_lambda_permission" "ecs_event_stream" {
 }
 
 resource "aws_lambda_function" "ecs_event_stream" {
-  function_name    = "${var.app}-${var.environment}-ecs-event-stream"
+  function_name    = "${var.env_name}-${var.resource_name}-ecs-event-stream"
   role             = aws_iam_role.ecs_event_stream.arn
   filename         = data.archive_file.lambda_zip.output_path
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   handler          = "index.handler"
   runtime          = "nodejs12.x"
-  tags             = var.tags
+  tags             = var.common_tags
 }
 
 resource "aws_lambda_alias" "ecs_event_stream" {
@@ -97,7 +97,7 @@ resource "aws_iam_role_policy_attachment" "ecs_event_stream" {
 
 # cloudwatch dashboard with logs insights query
 resource "aws_cloudwatch_dashboard" "ecs-event-stream" {
-  dashboard_name = "${var.app}-${var.environment}-ecs-event-stream"
+  dashboard_name = "${var.env_name}-${var.resource_name}-ecs-event-stream"
 
   dashboard_body = <<EOF
 {
@@ -109,8 +109,8 @@ resource "aws_cloudwatch_dashboard" "ecs-event-stream" {
       "width": 24,
       "height": 18,
       "properties": {
-        "query": "SOURCE '/aws/lambda/${var.app}-${var.environment}-ecs-event-stream' | fields @timestamp as time, detail.desiredStatus as desired, detail.lastStatus as latest, detail.stoppedReason as reason, detail.containers.0.reason as container_reason, detail.taskDefinitionArn as task_definition\n| filter @type != \"START\" and @type != \"END\" and @type != \"REPORT\"\n| sort detail.updatedAt desc, detail.version desc\n| limit 100",
-        "region": "${var.region}",
+        "query": "SOURCE '/aws/lambda/${var.env_name}-${var.resource_name}-ecs-event-stream' | fields @timestamp as time, detail.desiredStatus as desired, detail.lastStatus as latest, detail.stoppedReason as reason, detail.containers.0.reason as container_reason, detail.taskDefinitionArn as task_definition\n| filter @type != \"START\" and @type != \"END\" and @type != \"REPORT\"\n| sort detail.updatedAt desc, detail.version desc\n| limit 100",
+        "region": "${var.aws_region}",
         "title": "ECS Event Log"
       }
     }

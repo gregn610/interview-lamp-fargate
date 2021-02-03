@@ -14,9 +14,6 @@ variable "deregistration_delay" {
   default = "30"
 }
 
-# The path to the health check for the load balancer to know if the container(s) are ready
-variable "health_check" {
-}
 
 # How often to check the liveliness of the container
 variable "health_check_interval" {
@@ -38,7 +35,7 @@ variable "lb_access_logs_expiration_days" {
 }
 
 resource "aws_alb" "main" {
-  name = "${var.app}-${var.environment}"
+  name = "${var.env_name}-${var.resource_name}"
 
   # launch lbs in public or private subnets based on "internal" variable
   internal = var.internal
@@ -47,7 +44,7 @@ resource "aws_alb" "main" {
     var.internal == true ? var.private_subnets : var.public_subnets,
   )
   security_groups = [aws_security_group.nsg_lb.id]
-  tags            = var.tags
+  tags            = var.common_tags
 
   # enable access logs in order to get support from aws
   access_logs {
@@ -57,7 +54,7 @@ resource "aws_alb" "main" {
 }
 
 resource "aws_alb_target_group" "main" {
-  name                 = "${var.app}-${var.environment}"
+  name                 = "${var.env_name}-${var.resource_name}"
   port                 = var.lb_port
   protocol             = var.lb_protocol
   vpc_id               = var.vpc
@@ -73,7 +70,7 @@ resource "aws_alb_target_group" "main" {
     unhealthy_threshold = 5
   }
 
-  tags = var.tags
+  tags = var.common_tags
 }
 
 data "aws_elb_service_account" "main" {
@@ -81,9 +78,9 @@ data "aws_elb_service_account" "main" {
 
 # bucket for storing ALB access logs
 resource "aws_s3_bucket" "lb_access_logs" {
-  bucket        = "${var.app}-${var.environment}-lb-access-logs"
+  bucket        = "${var.env_name}-${var.resource_name}-lb-access-logs"
   acl           = "private"
-  tags          = var.tags
+  tags          = var.common_tags
   force_destroy = true
 
   lifecycle_rule {

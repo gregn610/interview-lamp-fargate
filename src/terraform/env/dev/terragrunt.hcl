@@ -7,11 +7,13 @@ terraform {
 locals {
   env_name      = "dev"
   resource_name = "demoapp"
+  aws_region    = "eu-west-2"
 }
 
 inputs = {
   env_name      = local.env_name
   resource_name = local.resource_name
+  aws_region    = local.aws_region
 }
 
 remote_state {
@@ -27,6 +29,17 @@ remote_state {
     encrypt        = true
     region         = "eu-west-2" # All TF remote state for account in same region
   }
+}
+
+generate "provider" {
+  path      = "providers.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+provider "aws" {
+  region = var.aws_region
+}
+EOF
+
 }
 
 include {

@@ -8,3 +8,7 @@ variable "resource_name" {
   type        = string
   description = "Used in resource names and tags. eg. demoapp"
 }
+
+variable "aws_region" {
+  type = string
+}

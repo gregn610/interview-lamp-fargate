@@ -37,12 +37,12 @@ variable "ecs_autoscale_max_instances" {
 }
 
 resource "aws_ecs_cluster" "app" {
-  name = "${var.app}-${var.environment}"
+  name = "${var.env_name}-${var.resource_name}"
   setting {
     name  = "containerInsights"
     value = "enabled"
   }
-  tags = var.tags
+  tags = var.common_tags
 }
 
 # The default docker image to deploy with the infrastructure.
@@ -65,7 +65,7 @@ resource "aws_appautoscaling_target" "app_scale_target" {
 }
 
 resource "aws_ecs_task_definition" "app" {
-  family                   = "${var.app}-${var.environment}"
+  family                   = "${var.env_name}-${var.resource_name}"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   cpu                      = "256"
@@ -103,18 +103,18 @@ resource "aws_ecs_task_definition" "app" {
       },
       {
         "name": "PRODUCT",
-        "value": "${var.app}"
+        "value": "${var.resource_name}"
       },
       {
         "name": "ENVIRONMENT",
-        "value": "${var.environment}"
+        "value": "${var.env_name}"
       }
     ],
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-group": "/fargate/service/${var.app}-${var.environment}",
-        "awslogs-region": "${var.region}",
+        "awslogs-group": "/fargate/service/${var.env_name}-${var.resource_name}",
+        "awslogs-region": "${var.aws_region}",
         "awslogs-stream-prefix": "ecs"
       }
     }
@@ -123,11 +123,11 @@ resource "aws_ecs_task_definition" "app" {
 DEFINITION
 
 
-  tags = var.tags
+  tags = var.common_tags
 }
 
 resource "aws_ecs_service" "app" {
-  name            = "${var.app}-${var.environment}"
+  name            = "${var.env_name}-${var.resource_name}"
   cluster         = aws_ecs_cluster.app.id
   launch_type     = "FARGATE"
   task_definition = aws_ecs_task_definition.app.arn
@@ -144,7 +144,7 @@ resource "aws_ecs_service" "app" {
     container_port   = var.container_port
   }
 
-  tags                    = var.tags
+  tags                    = var.common_tags
   enable_ecs_managed_tags = true
   propagate_tags          = "SERVICE"
 
@@ -160,7 +160,7 @@ resource "aws_ecs_service" "app" {
 
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html
 resource "aws_iam_role" "ecsTaskExecutionRole" {
-  name               = "${var.app}-${var.environment}-ecs"
+  name               = "${var.env_name}-${var.resource_name}-ecs"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 }
 
@@ -187,7 +187,7 @@ variable "logs_retention_in_days" {
 }
 
 resource "aws_cloudwatch_log_group" "logs" {
-  name              = "/fargate/service/${var.app}-${var.environment}"
+  name              = "/fargate/service/${var.env_name}-${var.resource_name}"
   retention_in_days = var.logs_retention_in_days
-  tags              = var.tags
+  tags              = var.common_tags
 }
