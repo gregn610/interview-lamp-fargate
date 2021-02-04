@@ -61,5 +61,5 @@ variable "certificate_arn" {
 
 variable "https_port" {
   description = "The port to listen on for HTTPS, always use 443"
-  default = "443"
+  default     = "443"
 }

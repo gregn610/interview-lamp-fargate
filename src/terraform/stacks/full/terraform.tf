@@ -33,6 +33,6 @@ module "demo_app" {
   private_subnets = join(",", module.network.private_subnets)
   public_subnets  = join(",", module.network.public_subnets)
 
-  health_check = "/healthz"
+  health_check    = "/healthz"
   certificate_arn = "arn:aws:acm:eu-west-2:074234086608:certificate/0431c855-16d4-4543-b6f6-a46bfb396115" # ToDo: hosted zone & certificate
 }
